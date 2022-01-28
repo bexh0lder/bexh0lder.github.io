@@ -92,10 +92,7 @@ SETUPSEG = 0x9020
 💡 bootsect.s中的数据 //在文件末尾
 <p>sectors:  .word  0</p>
 <p>msgl: .byte  13 , 10</p>
-<pre><code>     .ascii “Loading system...”（开机语句，可修改）
-
-.byte 13 , 10 , 13 , 10
-</code></pre>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">     .ascii “Loading system...”（开机语句，可修改）</span><br><span class="line"></span><br><span class="line">.byte 13 , 10 , 13 , 10</span><br></pre></td></tr></table></figure>
 </aside>
 <h3 id="read_it-//读入system模块">read_it //读入system模块<a title="#read_it-//读入system模块" href="#read_it-//读入system模块"></a></h3>
 <ul>
