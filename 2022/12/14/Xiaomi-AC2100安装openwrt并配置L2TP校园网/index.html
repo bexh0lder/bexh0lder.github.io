@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="本篇文章记录从刷过breed后台使用padavan固件的小米AC2100路由器转为使用openwrt固件  具体breed刷入教程请参照网络  用breed刷入openwrt路由器后面一般有一个reset按键，拔开电源后按住reset键不放再插上电源，一直到蓝色指示灯规律闪烁即可进入breed控制台 如果进不去记得看一下网络的IP设置是不是自动 输入网址192.168.1.1进入breed后台 添">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Xiaomi_AC2100安装openwrt并配置L2TP校园网">
+<meta property="og:url" content="https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/index.html">
+<meta property="og:site_name" content="LazyBex&#39;s blog">
+<meta property="og:description" content="本篇文章记录从刷过breed后台使用padavan固件的小米AC2100路由器转为使用openwrt固件  具体breed刷入教程请参照网络  用breed刷入openwrt路由器后面一般有一个reset按键，拔开电源后按住reset键不放再插上电源，一直到蓝色指示灯规律闪烁即可进入breed控制台 如果进不去记得看一下网络的IP设置是不是自动 输入网址192.168.1.1进入breed后台 添">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214103359927.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214200622629.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214200820611.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201055167.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201236397.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201255991.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201303716.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201314891.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222028702.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222144151.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222237675.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222331310.png">
+<meta property="article:published_time" content="2022-12-14T14:33:03.000Z">
+<meta property="article:modified_time" content="2022-12-14T14:36:53.501Z">
+<meta property="article:author" content="Bexh0lder">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214103359927.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Xiaomi_AC2100安装openwrt并配置L2TP校园网</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/bexh0lder">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2022/11/29/DASCTF-NOVX%E8%81%94%E5%90%88%E5%87%BA%E9%A2%98%E4%BA%BA2022%E5%B9%B4%E5%BA%A6%E7%A7%AF%E5%88%86%E6%A6%9C%E4%BA%89%E5%A4%BA%E8%B5%9B/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&text=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&is_video=false&description=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Xiaomi_AC2100安装openwrt并配置L2TP校园网&body=Check out this article: https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&name=Xiaomi_AC2100安装openwrt并配置L2TP校园网&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&t=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8breed%E5%88%B7%E5%85%A5openwrt"><span class="toc-number">1.</span> <span class="toc-text">用breed刷入openwrt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEopenwrt%E8%BF%9E%E6%8E%A5l2tp%E6%A0%A1%E5%9B%AD%E7%BD%91"><span class="toc-number">2.</span> <span class="toc-text">设置openwrt连接l2tp校园网</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Xiaomi_AC2100安装openwrt并配置L2TP校园网
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Bexh0lder</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-12-14T14:33:03.000Z" itemprop="datePublished">2022-12-14</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>本篇文章记录从刷过breed后台使用padavan固件的小米AC2100路由器转为使用openwrt固件</p>
+<blockquote>
+<p>具体breed刷入教程请参照网络</p>
+</blockquote>
+<h3 id="用breed刷入openwrt"><a href="#用breed刷入openwrt" class="headerlink" title="用breed刷入openwrt"></a>用breed刷入openwrt</h3><p>路由器后面一般有一个reset按键，拔开电源后按住reset键不放再插上电源，一直到蓝色指示灯规律闪烁即可进入breed控制台</p>
+<p>如果进不去记得看一下网络的IP设置是不是自动<img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214103359927.png" alt="image-20221214103359927"></p>
+<p>输入网址192.168.1.1进入breed后台</p>
+<p>添加一个环境变量</p>
+<table>
+<thead>
+<tr>
+<th align="center">xiaomi.r3g.bootfw</th>
+<th align="center">2</th>
+</tr>
+</thead>
+</table>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214200622629.png" alt="image-20221214200622629"></p>
+<p>刷入openwrt kernel固件</p>
+<blockquote>
+<p>固件下载地址：</p>
+<p><a href="https://firmware-selector.openwrt.org/?version=22.03.2&amp;target=ramips/mt7621&amp;id=xiaomi_mi-router-ac2100">https://firmware-selector.openwrt.org/?version=22.03.2&amp;target=ramips%2Fmt7621&amp;id=xiaomi_mi-router-ac2100</a></p>
+</blockquote>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214200820611.png" alt="image-20221214200820611"></p>
+<p>等待系统重启后再次进入192.168.1.1进入openwrt后台，默认密码为空，直接登录即可</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201055167.png" alt="image-20221214201055167"></p>
+<p>重新刷入sysupgrade版openwrt固件（kernel版固件存在于内存中，重启路由器即消失）</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201236397.png" alt="image-20221214201236397"></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201255991.png" alt="image-20221214201255991"></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201303716.png" alt="image-20221214201303716"></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214201314891.png" alt="image-20221214201314891"></p>
+<p>然后等待路由器重启后会自动重新进入openwrt后台</p>
+<h3 id="设置openwrt连接l2tp校园网"><a href="#设置openwrt连接l2tp校园网" class="headerlink" title="设置openwrt连接l2tp校园网"></a>设置openwrt连接l2tp校园网</h3><p>参照<a target="_blank" rel="noopener" href="https://kb5000.github.io/2020/11/21/OpenWrt%E8%BF%9E%E6%8E%A5%E6%A0%A1%E5%9B%AD%E7%BD%91L2TP%E7%8E%AF%E5%A2%83%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/">大佬教程</a>共享网络安装<code>xl2tpd</code>和<code>luci-i18n-base-zh-cn</code>中文语言包</p>
+<p>然后进入openwrt后台的网络-&gt;接口</p>
+<p>创建新接口选择L2TP协议</p>
+<blockquote>
+<p>如果安装完xl2tpd后没有L2TP协议记得先重启路由器</p>
+</blockquote>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222028702.png" alt="image-20221214222028702"></p>
+<p>修改接口信息填入服务器IP和用户名密码</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222144151.png" alt="image-20221214222144151"></p>
+<p>修改接口防火墙设置为<code>wan</code>区域</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222237675.png" alt="image-20221214222237675"></p>
+<p>然后点击保存并应用后重启一下路由器即可连接网络</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221214222331310.png" alt="image-20221214222331310"></p>
+<blockquote>
+<p>如果想要刷回原来固件的话继续按住reset键进入breed后台安装其他固件即可</p>
+</blockquote>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/bexh0lder">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8breed%E5%88%B7%E5%85%A5openwrt"><span class="toc-number">1.</span> <span class="toc-text">用breed刷入openwrt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEopenwrt%E8%BF%9E%E6%8E%A5l2tp%E6%A0%A1%E5%9B%AD%E7%BD%91"><span class="toc-number">2.</span> <span class="toc-text">设置openwrt连接l2tp校园网</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&text=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&is_video=false&description=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Xiaomi_AC2100安装openwrt并配置L2TP校园网&body=Check out this article: https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&title=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&name=Xiaomi_AC2100安装openwrt并配置L2TP校园网&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://bexh0lder.github.io/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/&t=Xiaomi_AC2100安装openwrt并配置L2TP校园网"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2022
+    Bexh0lder
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/bexh0lder">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'bexh0lder/bexh0lder.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>
