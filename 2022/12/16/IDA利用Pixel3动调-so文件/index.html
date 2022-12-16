@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="USB连接手机用数据线连接Pixel 3和主机，然后在Pixel 3中选择信任主机 然后用adb连接 1adb usb  然后输入 1adb devices  可以查看是否已连接  然后通过adb将apk安装到手机上 123adb install &lt;APK文件&gt;# 卸载# adb uninstall &lt;APK文件&gt;  IDA连接手机将android_server存入手机（该">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IDA利用Pixel3动调.so文件">
+<meta property="og:url" content="https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/index.html">
+<meta property="og:site_name" content="LazyBex&#39;s blog">
+<meta property="og:description" content="USB连接手机用数据线连接Pixel 3和主机，然后在Pixel 3中选择信任主机 然后用adb连接 1adb usb  然后输入 1adb devices  可以查看是否已连接  然后通过adb将apk安装到手机上 123adb install &lt;APK文件&gt;# 卸载# adb uninstall &lt;APK文件&gt;  IDA连接手机将android_server存入手机（该">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211154250928.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211155901595.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211160726234.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216135120408.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216135222696.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216143617216.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211161644148.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211160611200.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211160625770.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211161138328.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211161304454.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144016190.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144033775.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144119913.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144157743.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184027352.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184424139.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184610654.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184702546.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184759386.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185143884.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185209646.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185308838.png">
+<meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185458961.png">
+<meta property="article:published_time" content="2022-12-16T11:08:15.000Z">
+<meta property="article:modified_time" content="2022-12-16T11:08:42.246Z">
+<meta property="article:author" content="Bexh0lder">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211154250928.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>IDA利用Pixel3动调.so文件</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/bexh0lder">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2022/12/14/Xiaomi-AC2100%E5%AE%89%E8%A3%85openwrt%E5%B9%B6%E9%85%8D%E7%BD%AEL2TP%E6%A0%A1%E5%9B%AD%E7%BD%91/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&text=IDA利用Pixel3动调.so文件"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&is_video=false&description=IDA利用Pixel3动调.so文件"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=IDA利用Pixel3动调.so文件&body=Check out this article: https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&name=IDA利用Pixel3动调.so文件&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&t=IDA利用Pixel3动调.so文件"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#USB%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">USB连接手机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">2.</span> <span class="toc-text">IDA连接手机</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Android-Device-Monitor%E6%9F%A5%E7%9C%8Bapk%E7%9A%84jdb%E8%B0%83%E8%AF%95%E7%AB%AF%E5%8F%A3"><span class="toc-number">2.1.</span> <span class="toc-text">利用Android Device Monitor查看apk的jdb调试端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA%E9%99%84%E5%8A%A0%E7%A8%8B%E5%BA%8F%E8%B0%83%E8%AF%95"><span class="toc-number">2.2.</span> <span class="toc-text">IDA附加程序调试</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        IDA利用Pixel3动调.so文件
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Bexh0lder</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-12-16T11:08:15.000Z" itemprop="datePublished">2022-12-16</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="USB连接手机"><a href="#USB连接手机" class="headerlink" title="USB连接手机"></a>USB连接手机</h3><p>用数据线连接Pixel 3和主机，然后在Pixel 3中选择信任主机</p>
+<p>然后用adb连接</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb usb</span><br></pre></td></tr></table></figure>
+
+<p>然后输入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb devices</span><br></pre></td></tr></table></figure>
+
+<p>可以查看是否已连接</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211154250928.png" alt="image-20221211154250928"></p>
+<p>然后通过adb将apk安装到手机上</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">adb install &lt;APK文件&gt;</span><br><span class="line"><span class="comment"># 卸载</span></span><br><span class="line"><span class="comment"># adb uninstall &lt;APK文件&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="IDA连接手机"><a href="#IDA连接手机" class="headerlink" title="IDA连接手机"></a>IDA连接手机</h3><p>将android_server存入手机（该文件位于<code>&lt;IDA目录&gt;/dbgsrv/</code>）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb push .\android_server64 /data/local/tmp</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可以在shell中执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getprop ro.product.cpu.abi</span><br></pre></td></tr></table></figure>
+
+<p>来查询手机CPU架构</p>
+</blockquote>
+<p>打开手机shell</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell</span><br></pre></td></tr></table></figure>
+
+<p>进入存放android_server的文件夹给</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /data/local/tmp</span><br></pre></td></tr></table></figure>
+
+<p>获得root权限后给android_server执行权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">su</span><br><span class="line"><span class="built_in">chmod</span> 777 android_server</span><br></pre></td></tr></table></figure>
+
+<p>运行android_server</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./android_server</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211155901595.png" alt="image-20221211155901595"></p>
+<p>端口转发</p>
+<p>由于android_server在Android真机设备的23946端口上运行，而IDA Pro在PC端，要想用IDA动态调试，需要将Android系统上的23946端口转发到PC端的23946端口，再打开一个CMD运行以下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:23946 tcp:23946</span><br></pre></td></tr></table></figure>
+
+<p>运行要调试的apk</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n com.ctf.CheckYourKey/.MainActivity</span><br></pre></td></tr></table></figure>
+
+<p>此时手机会变成这样</p>
+<img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211160726234.png" alt="image-20221211160726234" style="zoom: 10%;" />
+
+<h4 id="利用Android-Device-Monitor查看apk的jdb调试端口"><a href="#利用Android-Device-Monitor查看apk的jdb调试端口" class="headerlink" title="利用Android Device Monitor查看apk的jdb调试端口"></a>利用Android Device Monitor查看apk的jdb调试端口</h4><blockquote>
+<p><strong>Android Studio</strong>自带以下的文件，可以自行搜索运行，这里展示的是未安装<strong>Android Studio</strong>运行Android Device Monitor的方式</p>
+</blockquote>
+<p>下载android 3.1 SDK</p>
+<p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1pJ0naTP?utm_source=androiddevtools&amp;utm_medium=website">https://pan.baidu.com/s/1pJ0naTP?utm_source=androiddevtools&amp;utm_medium=website</a></p>
+<p>下载platform-tools-r22</p>
+<p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1sj4ZfTb?utm_source=androiddevtools&amp;utm_medium=website">https://pan.baidu.com/s/1sj4ZfTb?utm_source=androiddevtools&amp;utm_medium=website</a></p>
+<p>下载SDK Tools</p>
+<p><a target="_blank" rel="noopener" href="https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip?utm_source=androiddevtools&amp;utm_medium=website">https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip?utm_source=androiddevtools&amp;utm_medium=website</a></p>
+<p>下载JDK1.8</p>
+<p><a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html#license-lightbox">https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html#license-lightbox</a></p>
+<p>而后将下载解压好的<code>SDK Tools</code>文件夹和platform-tools文件夹放入<code>android 3.1 SDK</code>的文件夹</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216135120408.png" alt="image-20221216135120408"></p>
+<p>然后运行<code>tools/monitor.bat</code>即可打开Android Device Monitor</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216135222696.png" alt="image-20221216135222696"></p>
+<p>记录下端口为8600，不要关闭Android Device Monitor</p>
+<h4 id="IDA附加程序调试"><a href="#IDA附加程序调试" class="headerlink" title="IDA附加程序调试"></a>IDA附加程序调试</h4><p>使用IDA打开要调试的so文件</p>
+<p>选择Remote Android调试器</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216143617216.png"></p>
+<p>选择IDA工具栏的Debugger-&gt;Debugger options，勾选Suspend on process entry point、Suspend on thread start/exit、Suspend on library load/unload这三个选项，使其在加载完so文件后暂停</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211161644148.png" alt="image-20221211161644148"></p>
+<p>打开IDA的<code>Debugger-&gt;Attach-&gt;Remote ARM Linux/Android debugger</code></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211160611200.png" alt="image-20221211160611200"></p>
+<p>成功连接</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211160625770.png" alt="image-20221211160625770"></p>
+<blockquote>
+<p>如果adb shell中提示</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211161138328.png" alt="image-20221211161138328"></p>
+<p>且IDA中显示</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211161304454.png" alt="image-20221211161304454"></p>
+<p>就说明用错android_server了，android_server为32位的，android_server64为64位的，并且要使用<strong>对应位数的IDA</strong></p>
+</blockquote>
+<p>然后附加到想要的进程上，可以用search来搜索</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144016190.png" alt="image-20221216144016190"></p>
+<p>然后点击绿色箭头或按F9来运行</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144033775.png" alt="image-20221216144033775"></p>
+<p>然后使用jdk1.8的jdb运行以下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\jdb.exe -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8600</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144119913.png" alt="image-20221216144119913"></p>
+<p>成功运行后Android Device Monitor的虫子会变绿色</p>
+<blockquote>
+<p>这里的8600端口号就是之前Android Device Monitor看到的程序端口号</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216144157743.png" alt="image-20221216144157743"></p>
+</blockquote>
+<blockquote>
+<p>如果jdb连接出现类似于下面这种错误错误</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184027352.png" alt="image-20221216184027352"></p>
+<p>可以使用以下步骤解决</p>
+<ol>
+<li>adb shell </li>
+<li>su</li>
+<li>export IDA_LIBC_PATH=/apex/com.android.runtime/lib64/bionic/libc.so</li>
+<li>再开始进行正常调试的步骤</li>
+</ol>
+<p>参考<a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-268276.htm">https://bbs.pediy.com/thread-268276.htm</a></p>
+</blockquote>
+<p>然后转到IDA</p>
+<p>可以看到已经加载了第一个so</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184424139.png" alt="image-20221216184424139"></p>
+<p>然后继续按F9运行，它停下重新按F9运行一直到运行到加载我们需要动调的so文件</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184610654.png" alt="image-20221216184610654"></p>
+<p>然后在modules页面里就可以看到我们需要的so，双击so文件然后找到<code>JNI_OnLoad</code></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184702546.png" alt="image-20221216184702546"></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216184759386.png" alt="image-20221216184759386"></p>
+<p>在方法的第一句下断点，然后<strong>关闭Debugger-&gt;Debugger options种之前勾选的三个选项</strong></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185143884.png" alt="image-20221216185143884"></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185209646.png" alt="image-20221216185209646"></p>
+<p>然后按F9运行，就可以看到程序运行到了我们的断点处</p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185308838.png" alt="image-20221216185308838"></p>
+<p>之后我们就可以正常分析<code>JNI_OnLoad</code>找到动态注册表，具体分析可以参考<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c423e5fefd5e">https://www.jianshu.com/p/c423e5fefd5e</a></p>
+<p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185458961.png" alt="image-20221216185458961"></p>
+<blockquote>
+<p>不知道为什么笔者以这种方式调试手机上是空白的一片</p>
+<p>所以我在找到对应函数后采用了以下步骤动调函数内部</p>
+<ol>
+<li>在手机上直接安装运行所要调试的apk</li>
+<li>按之前的方法使用adb连接手机并运行相应的android_server并进行adb端口转发</li>
+<li>然后打开IDA后选择Remote Android调试器并attach进程</li>
+<li>然后在之前找到的函数内部下断点，然后在shou’ji输入内容按下按钮进行调试</li>
+</ol>
+</blockquote>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/bexh0lder">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#USB%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">USB连接手机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">2.</span> <span class="toc-text">IDA连接手机</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Android-Device-Monitor%E6%9F%A5%E7%9C%8Bapk%E7%9A%84jdb%E8%B0%83%E8%AF%95%E7%AB%AF%E5%8F%A3"><span class="toc-number">2.1.</span> <span class="toc-text">利用Android Device Monitor查看apk的jdb调试端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA%E9%99%84%E5%8A%A0%E7%A8%8B%E5%BA%8F%E8%B0%83%E8%AF%95"><span class="toc-number">2.2.</span> <span class="toc-text">IDA附加程序调试</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&text=IDA利用Pixel3动调.so文件"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&is_video=false&description=IDA利用Pixel3动调.so文件"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=IDA利用Pixel3动调.so文件&body=Check out this article: https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&title=IDA利用Pixel3动调.so文件"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&name=IDA利用Pixel3动调.so文件&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://bexh0lder.github.io/2022/12/16/IDA%E5%88%A9%E7%94%A8Pixel3%E5%8A%A8%E8%B0%83-so%E6%96%87%E4%BB%B6/&t=IDA利用Pixel3动调.so文件"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2022
+    Bexh0lder
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/bexh0lder">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'bexh0lder/bexh0lder.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>
