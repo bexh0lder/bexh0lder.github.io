@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185308838.png">
 <meta property="og:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216185458961.png">
 <meta property="article:published_time" content="2022-12-16T11:08:15.000Z">
-<meta property="article:modified_time" content="2022-12-16T11:08:42.246Z">
+<meta property="article:modified_time" content="2022-12-16T11:36:42.884Z">
 <meta property="article:author" content="Bexh0lder">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211154250928.png">
@@ -126,7 +126,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#USB%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">USB连接手机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">2.</span> <span class="toc-text">IDA连接手机</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Android-Device-Monitor%E6%9F%A5%E7%9C%8Bapk%E7%9A%84jdb%E8%B0%83%E8%AF%95%E7%AB%AF%E5%8F%A3"><span class="toc-number">2.1.</span> <span class="toc-text">利用Android Device Monitor查看apk的jdb调试端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA%E9%99%84%E5%8A%A0%E7%A8%8B%E5%BA%8F%E8%B0%83%E8%AF%95"><span class="toc-number">2.2.</span> <span class="toc-text">IDA附加程序调试</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#USB%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">USB连接手机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IDA%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">2.</span> <span class="toc-text">IDA连接手机</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Android-Device-Monitor%E6%9F%A5%E7%9C%8Bapk%E7%9A%84jdb%E8%B0%83%E8%AF%95%E7%AB%AF%E5%8F%A3"><span class="toc-number">2.1.</span> <span class="toc-text">利用Android Device Monitor查看apk的jdb调试端口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E9%99%84%E5%8A%A0%E7%A8%8B%E5%BA%8F%E8%B0%83%E8%AF%95"><span class="toc-number">2.2.</span> <span class="toc-text">IDA附加程序调试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-number">3.</span> <span class="toc-text">Reference</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -165,7 +165,7 @@
   
 
   <div class="content" itemprop="articleBody">
-    <h3 id="USB连接手机"><a href="#USB连接手机" class="headerlink" title="USB连接手机"></a>USB连接手机</h3><p>用数据线连接Pixel 3和主机，然后在Pixel 3中选择信任主机</p>
+    <h2 id="USB连接手机"><a href="#USB连接手机" class="headerlink" title="USB连接手机"></a>USB连接手机</h2><p>用数据线连接Pixel 3和主机，然后在Pixel 3中选择信任主机</p>
 <p>然后用adb连接</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb usb</span><br></pre></td></tr></table></figure>
 
@@ -177,7 +177,7 @@
 <p>然后通过adb将apk安装到手机上</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">adb install &lt;APK文件&gt;</span><br><span class="line"><span class="comment"># 卸载</span></span><br><span class="line"><span class="comment"># adb uninstall &lt;APK文件&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="IDA连接手机"><a href="#IDA连接手机" class="headerlink" title="IDA连接手机"></a>IDA连接手机</h3><p>将android_server存入手机（该文件位于<code>&lt;IDA目录&gt;/dbgsrv/</code>）</p>
+<h2 id="IDA连接手机"><a href="#IDA连接手机" class="headerlink" title="IDA连接手机"></a>IDA连接手机</h2><p>将android_server存入手机（该文件位于<code>&lt;IDA目录&gt;/dbgsrv/</code>）</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb push .\android_server64 /data/local/tmp</span><br></pre></td></tr></table></figure>
 
 <blockquote>
@@ -209,7 +209,7 @@
 <p>此时手机会变成这样</p>
 <img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221211160726234.png" alt="image-20221211160726234" style="zoom: 10%;" />
 
-<h4 id="利用Android-Device-Monitor查看apk的jdb调试端口"><a href="#利用Android-Device-Monitor查看apk的jdb调试端口" class="headerlink" title="利用Android Device Monitor查看apk的jdb调试端口"></a>利用Android Device Monitor查看apk的jdb调试端口</h4><blockquote>
+<h3 id="利用Android-Device-Monitor查看apk的jdb调试端口"><a href="#利用Android-Device-Monitor查看apk的jdb调试端口" class="headerlink" title="利用Android Device Monitor查看apk的jdb调试端口"></a>利用Android Device Monitor查看apk的jdb调试端口</h3><blockquote>
 <p><strong>Android Studio</strong>自带以下的文件，可以自行搜索运行，这里展示的是未安装<strong>Android Studio</strong>运行Android Device Monitor的方式</p>
 </blockquote>
 <p>下载android 3.1 SDK</p>
@@ -225,7 +225,7 @@
 <p>然后运行<code>tools/monitor.bat</code>即可打开Android Device Monitor</p>
 <p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216135222696.png" alt="image-20221216135222696"></p>
 <p>记录下端口为8600，不要关闭Android Device Monitor</p>
-<h4 id="IDA附加程序调试"><a href="#IDA附加程序调试" class="headerlink" title="IDA附加程序调试"></a>IDA附加程序调试</h4><p>使用IDA打开要调试的so文件</p>
+<h3 id="IDA附加程序调试"><a href="#IDA附加程序调试" class="headerlink" title="IDA附加程序调试"></a>IDA附加程序调试</h3><p>使用IDA打开要调试的so文件</p>
 <p>选择Remote Android调试器</p>
 <p><img src="http://bex-image.oss-cn-hangzhou.aliyuncs.com/img/image-20221216143617216.png"></p>
 <p>选择IDA工具栏的Debugger-&gt;Debugger options，勾选Suspend on process entry point、Suspend on thread start/exit、Suspend on library load/unload这三个选项，使其在加载完so文件后暂停</p>
@@ -291,6 +291,14 @@
 <li>然后在之前找到的函数内部下断点，然后在shou’ji输入内容按下按钮进行调试</li>
 </ol>
 </blockquote>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/358496347">https://zhuanlan.zhihu.com/p/358496347</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c423e5fefd5e">https://www.jianshu.com/p/c423e5fefd5e</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-268276.htm">https://bbs.pediy.com/thread-268276.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-266192.htm">https://bbs.pediy.com/thread-266192.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43873389/article/details/118579771">https://blog.csdn.net/weixin_43873389/article/details/118579771</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.androiddevtools.cn/index.html">https://www.androiddevtools.cn/index.html</a></li>
+</ul>
 
   </div>
 </article>
@@ -320,7 +328,7 @@
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#USB%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">USB连接手机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">2.</span> <span class="toc-text">IDA连接手机</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Android-Device-Monitor%E6%9F%A5%E7%9C%8Bapk%E7%9A%84jdb%E8%B0%83%E8%AF%95%E7%AB%AF%E5%8F%A3"><span class="toc-number">2.1.</span> <span class="toc-text">利用Android Device Monitor查看apk的jdb调试端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA%E9%99%84%E5%8A%A0%E7%A8%8B%E5%BA%8F%E8%B0%83%E8%AF%95"><span class="toc-number">2.2.</span> <span class="toc-text">IDA附加程序调试</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#USB%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">USB连接手机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IDA%E8%BF%9E%E6%8E%A5%E6%89%8B%E6%9C%BA"><span class="toc-number">2.</span> <span class="toc-text">IDA连接手机</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Android-Device-Monitor%E6%9F%A5%E7%9C%8Bapk%E7%9A%84jdb%E8%B0%83%E8%AF%95%E7%AB%AF%E5%8F%A3"><span class="toc-number">2.1.</span> <span class="toc-text">利用Android Device Monitor查看apk的jdb调试端口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E9%99%84%E5%8A%A0%E7%A8%8B%E5%BA%8F%E8%B0%83%E8%AF%95"><span class="toc-number">2.2.</span> <span class="toc-text">IDA附加程序调试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reference"><span class="toc-number">3.</span> <span class="toc-text">Reference</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
